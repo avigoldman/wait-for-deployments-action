@@ -1,0 +1,16 @@
+name: "Wait For deployments"
+description: "Waits for all deployments to complete before continuing"
+branding:
+  icon: "server"
+  color: "blue"
+inputs:
+  max_timeout:
+    description: "The max seconds to run wait"
+    default: "600"
+    required: false
+outputs:
+  deployments:
+    description: "Array containing the deployment names and URLs"
+runs:
+  using: "node12"
+  main: "index.js"
