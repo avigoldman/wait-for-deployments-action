@@ -1,5 +1,5 @@
 name: "Wait For deployments"
-description: "Waits for all deployments to complete before continuing"
+description: "Waits for all deployments to complete before continuing."
 branding:
   icon: "server"
   color: "blue"
