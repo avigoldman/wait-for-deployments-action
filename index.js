@@ -27,6 +27,7 @@ const { get, last } = require("lodash");
       await sleep(parseInt(core.getInput("check_interval")) * 1000);
     }
   } catch (error) {
+    console.log("here");
     core.setFailed(error.message);
   }
 
@@ -98,8 +99,7 @@ async function checkIfDeploymentsAreDone() {
     const state = get(data, "0.state");
 
     if (state === "failure") {
-      console.log("throw error", deployment);
-      // throw new Error(` failed.`);
+      throw new Error(`${deployment.environment} failed.`);
     }
 
     if (state === "pending") {
