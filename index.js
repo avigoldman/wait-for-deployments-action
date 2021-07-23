@@ -7,6 +7,9 @@ const { get, last } = require("lodash");
     core.info(`Starting...`);
     let cleanChecks = 0;
 
+    /**
+     * We confirm 3 times in case there is a deploy that is slow to start up
+     */
     while (cleanChecks < 3) {
       core.info(`Running deployment check...`);
       if (await checkIfDeploymentsAreDone()) {
@@ -27,13 +30,13 @@ const { get, last } = require("lodash");
     core.setFailed(error.message);
   }
 
-  // setTimeout(() => {
-  //   core.setFailed(
-  //     `Timed out after ${core.getInput(
-  //       "max_timeout"
-  //     )} seconds of waiting for deployments`
-  //   );
-  // }, parseInt(core.getInput("max_timeout")) * 1000);
+  setTimeout(() => {
+    core.setFailed(
+      `Timed out after ${core.getInput(
+        "max_timeout"
+      )} seconds of waiting for deployments`
+    );
+  }, parseInt(core.getInput("max_timeout")) * 1000);
 })();
 
 async function checkIfDeploymentsAreDone() {
@@ -91,6 +94,8 @@ async function checkIfDeploymentsAreDone() {
     const { state } = await octokit.request(
       `GET /repos/${repoName}/deployments/${deployment.id}/statuses`
     );
+
+    console.log({ state });
 
     if (state === "error") {
       throw new Error(`${deployment.environment} failed.`);
