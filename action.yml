@@ -12,7 +12,7 @@ inputs:
     required: false
   max_timeout:
     description: "Max seconds to wait for the deploys to finish."
-    default: "600"
+    default: "900"
     required: false
 outputs:
   deployments:
