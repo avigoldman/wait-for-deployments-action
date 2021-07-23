@@ -40,7 +40,7 @@ async function checkIfDeploymentsAreDone() {
   const commit = get(
     github,
     "context.payload.after",
-    get(github, "context.playload.pull_request.head.sha", "")
+    get(github, "context.payload.pull_request.head.sha", "")
   );
   const branch = last(
     get(
