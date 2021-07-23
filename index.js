@@ -8,13 +8,17 @@ const { get, last } = require("lodash");
     let cleanChecks = 0;
 
     while (cleanChecks < 3) {
-      core.info(`Running check...`);
+      core.info(`Running deployment check...`);
       if (await checkIfDeploymentsAreDone()) {
         cleanChecks++;
         core.info(`Passed ${cleanChecks} times`);
       } else {
         cleanChecks = 0;
-        core.info(`Waiting again...`);
+        core.info(
+          `Pending deployments. Checking again in ${core.getInput(
+            "max_timeout"
+          )} seconds...`
+        );
       }
 
       await sleep(parseInt(core.getInput("max_timeout")) * 1000);
