@@ -2,27 +2,29 @@ const core = require("@actions/core");
 const github = require("@actions/github");
 const { get, last } = require("lodash");
 
-let cleanChecks = 0;
+(async () => {
+  let cleanChecks = 0;
 
-while (cleanChecks < 3) {
-  if (await checkIfDeploymentsAreDone()) {
-    cleanChecks++;
-    console.log(`passed ${cleanChecks} times`);
-  } else {
-    cleanChecks = 0;
-    console.log(`Waiting again...`);
+  while (cleanChecks < 3) {
+    if (await checkIfDeploymentsAreDone()) {
+      cleanChecks++;
+      console.log(`passed ${cleanChecks} times`);
+    } else {
+      cleanChecks = 0;
+      console.log(`Waiting again...`);
+    }
+
+    await sleep(parseInt(core.getInput("max_timeout")) * 1000);
   }
 
-  await sleep(parseInt(core.getInput("max_timeout")) * 1000);
-}
-
-setTimeout(() => {
-  core.setFailed(
-    `Timed out after ${core.getInput(
-      "max_timeout"
-    )} seconds of waiting for deployments`
-  );
-}, parseInt(core.getInput("max_timeout")) * 1000);
+  setTimeout(() => {
+    core.setFailed(
+      `Timed out after ${core.getInput(
+        "max_timeout"
+      )} seconds of waiting for deployments`
+    );
+  }, parseInt(core.getInput("max_timeout")) * 1000);
+})();
 
 async function checkIfDeploymentsAreDone() {
   try {
