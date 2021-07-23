@@ -37,8 +37,12 @@ let timeout = setTimeout(() => {
     await sleep(parseInt(core.getInput("check_interval")) * 1000);
   }
 
+  core.info(
+    `${deployments} deployment${
+      deployments.length === 1 ? "" : "s"
+    } look good 🚀`
+  );
   core.setOutput("deployments", deployments);
-  core.info(`Passed 3 times. All deploys look good 🚀`);
 })()
   .then(() => {
     clearTimeout(timeout);
