@@ -10,34 +10,33 @@ const { get, last } = require("lodash");
     /**
      * We confirm 3 times in case there is a deploy that is slow to start up
      */
-    while (cleanChecks < 3) {
-      core.info(`Running deployment check...`);
-      if (await checkIfDeploymentsAreDone()) {
-        cleanChecks++;
-        core.info(`Passed ${cleanChecks} times`);
-      } else {
-        cleanChecks = 0;
-        core.info(
-          `Pending deployments. Checking again in ${core.getInput(
-            "max_timeout"
-          )} seconds...`
-        );
-      }
-
-      await sleep(parseInt(core.getInput("check_interval")) * 1000);
+    // while (cleanChecks < 3) {
+    core.info(`Running deployment check...`);
+    if (await checkIfDeploymentsAreDone()) {
+      cleanChecks++;
+      core.info(`Passed ${cleanChecks} times`);
+    } else {
+      cleanChecks = 0;
+      core.info(
+        `Pending deployments. Checking again in ${core.getInput(
+          "max_timeout"
+        )} seconds...`
+      );
     }
+
+    await sleep(parseInt(core.getInput("check_interval")) * 1000);
+    // }
   } catch (error) {
-    console.log("here");
     core.setFailed(error.message);
   }
 
-  setTimeout(() => {
-    core.setFailed(
-      `Timed out after ${core.getInput(
-        "max_timeout"
-      )} seconds of waiting for deployments`
-    );
-  }, parseInt(core.getInput("max_timeout")) * 1000);
+  // setTimeout(() => {
+  //   core.setFailed(
+  //     `Timed out after ${core.getInput(
+  //       "max_timeout"
+  //     )} seconds of waiting for deployments`
+  //   );
+  // }, parseInt(core.getInput("max_timeout")) * 1000);
 })();
 
 async function checkIfDeploymentsAreDone() {
