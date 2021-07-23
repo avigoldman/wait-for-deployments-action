@@ -91,21 +91,19 @@ async function checkIfDeploymentsAreDone() {
    * if it is pending, return we are not done
    */
   for (const deployment of deployments) {
-    const {
-      data: [{ state }],
-    } = await octokit.request(
+    const { data } = await octokit.request(
       `GET /repos/${repoName}/deployments/${deployment.id}/statuses`
     );
 
-    console.log({ state });
+    console.log({ data });
 
-    if (state === "failure") {
-      throw new Error(`${deployment.environment} failed.`);
-    }
+    // if (state === "failure") {
+    //   throw new Error(`${deployment.environment} failed.`);
+    // }
 
-    if (state === "pending") {
-      return false;
-    }
+    // if (state === "pending") {
+    //   return false;
+    // }
   }
 
   // if all deployments passed, we are good to go!
