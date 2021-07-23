@@ -21,7 +21,7 @@ const { get, last } = require("lodash");
         );
       }
 
-      await sleep(parseInt(core.getInput("max_timeout")) * 1000);
+      await sleep(parseInt(core.getInput("check_interval")) * 1000);
     }
   } catch (error) {
     core.setFailed(error.message);
