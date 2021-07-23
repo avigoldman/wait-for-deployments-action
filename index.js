@@ -99,6 +99,7 @@ async function checkIfDeploymentsAreDone() {
     const state = get(data, "0.state");
 
     if (state === "failure") {
+      core.setFailed(`${deployment.environment} failed.`);
       throw new Error(`${deployment.environment} failed.`);
     }
 
