@@ -99,7 +99,7 @@ async function checkIfDeploymentsAreDone() {
 
     if (state === "failure") {
       console.log("throw error", deployment);
-      throw new Error(` failed.`);
+      // throw new Error(` failed.`);
     }
 
     if (state === "pending") {
