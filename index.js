@@ -7,29 +7,30 @@ const { get, last } = require("lodash");
     core.info(`Starting...`);
     let cleanChecks = 0;
 
-    while (cleanChecks < 3) {
-      core.info(`Running check...`);
-      if (await checkIfDeploymentsAreDone()) {
-        cleanChecks++;
-        core.info(`passed ${cleanChecks} times`);
-      } else {
-        cleanChecks = 0;
-        core.info(`Waiting again...`);
-      }
+    // while (cleanChecks < 3) {
+    core.info(`Running check...`);
+    await checkIfDeploymentsAreDone();
+    // if (await checkIfDeploymentsAreDone()) {
+    cleanChecks++;
+    core.info(`passed ${cleanChecks} times`);
+    // } else {
+    //   cleanChecks = 0;
+    //   core.info(`Waiting again...`);
+    // }
 
-      await sleep(parseInt(core.getInput("max_timeout")) * 1000);
-    }
+    // await sleep(parseInt(core.getInput("max_timeout")) * 1000);
+    // }
   } catch (error) {
     core.setFailed(error.message);
   }
 
-  setTimeout(() => {
-    core.setFailed(
-      `Timed out after ${core.getInput(
-        "max_timeout"
-      )} seconds of waiting for deployments`
-    );
-  }, parseInt(core.getInput("max_timeout")) * 1000);
+  // setTimeout(() => {
+  //   core.setFailed(
+  //     `Timed out after ${core.getInput(
+  //       "max_timeout"
+  //     )} seconds of waiting for deployments`
+  //   );
+  // }, parseInt(core.getInput("max_timeout")) * 1000);
 })();
 
 async function checkIfDeploymentsAreDone() {
@@ -43,37 +44,39 @@ async function checkIfDeploymentsAreDone() {
     )
   );
 
-  const { data: commitDeployments } = await octokit.request(
-    `GET /repos/${repoName}/deployments`,
-    {
-      ref: commit,
-      per_page: 100,
-    }
-  );
+  console.log({ repoName, commit, branch });
 
-  const { data: branchDeployments } = await octokit.request(
-    `GET /repos/${repoName}/deployments`,
-    {
-      ref: branch,
-      per_page: 100,
-    }
-  );
+  // const { data: commitDeployments } = await octokit.request(
+  //   `GET /repos/${repoName}/deployments`,
+  //   {
+  //     ref: commit,
+  //     per_page: 100,
+  //   }
+  // );
 
-  const deployments = [...commitDeployments, ...branchDeployments];
+  // const { data: branchDeployments } = await octokit.request(
+  //   `GET /repos/${repoName}/deployments`,
+  //   {
+  //     ref: branch,
+  //     per_page: 100,
+  //   }
+  // );
 
-  for (const deployment of deployments) {
-    const { state } = await octokit.request(
-      `GET /repos/${repoName}/deployments/${deployment.id}/statuses`
-    );
+  // const deployments = [...commitDeployments, ...branchDeployments];
 
-    if (state === "error") {
-      throw new Error(`${deployment.environment} failed.`);
-    }
+  // for (const deployment of deployments) {
+  //   const { state } = await octokit.request(
+  //     `GET /repos/${repoName}/deployments/${deployment.id}/statuses`
+  //   );
 
-    if (state === "pending") {
-      return false;
-    }
-  }
+  //   if (state === "error") {
+  //     throw new Error(`${deployment.environment} failed.`);
+  //   }
+
+  //   if (state === "pending") {
+  //     return false;
+  //   }
+  // }
 }
 
 function sleep(ms) {
