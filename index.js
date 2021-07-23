@@ -50,6 +50,7 @@ async function checkIfDeploymentsAreDone() {
     ).split("/")
   );
 
+  // get the deploys tied to the commit
   let commitDeployments = [];
   if (commit.length > 0) {
     const { data } = await octokit.request(
@@ -62,6 +63,7 @@ async function checkIfDeploymentsAreDone() {
     commitDeployments = data;
   }
 
+  // get the deploys tied to the branch
   let branchDeployments = [];
   if (branch.length > 0) {
     const { data } = await octokit.request(
@@ -76,21 +78,28 @@ async function checkIfDeploymentsAreDone() {
 
   const deployments = [...commitDeployments, ...branchDeployments];
 
-  console.log({ deployments });
+  /**
+   * Check each deployments status
+   *
+   * If it is error, pass it through,
+   * if it is pending, return we are not done
+   */
+  for (const deployment of deployments) {
+    const { state } = await octokit.request(
+      `GET /repos/${repoName}/deployments/${deployment.id}/statuses`
+    );
 
-  // for (const deployment of deployments) {
-  //   const { state } = await octokit.request(
-  //     `GET /repos/${repoName}/deployments/${deployment.id}/statuses`
-  //   );
+    if (state === "error") {
+      throw new Error(`${deployment.environment} failed.`);
+    }
 
-  //   if (state === "error") {
-  //     throw new Error(`${deployment.environment} failed.`);
-  //   }
+    if (state === "pending") {
+      return false;
+    }
+  }
 
-  //   if (state === "pending") {
-  //     return false;
-  //   }
-  // }
+  // if all deployments passed, we are good to go!
+  return true;
 }
 
 function sleep(ms) {
