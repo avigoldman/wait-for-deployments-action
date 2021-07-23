@@ -2,7 +2,8 @@ const core = require("@actions/core");
 const github = require("@actions/github");
 const { get, last } = require("lodash");
 
-console.log("here1")(async () => {
+console.log("here1");
+(async () => {
   console.log("here2");
   core.info(`Starting...`);
   // let cleanChecks = 0;
