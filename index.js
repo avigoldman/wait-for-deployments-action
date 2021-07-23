@@ -6,6 +6,14 @@ const { get, last } = require("lodash");
   core.info(`Starting...`);
   let cleanChecks = 0;
 
+  setTimeout(() => {
+    core.setFailed(
+      `Timed out after ${core.getInput(
+        "max_timeout"
+      )} seconds of waiting for deployments`
+    );
+  }, parseInt(core.getInput("max_timeout")) * 1000);
+
   /**
    * We confirm 3 times in case there is a deploy that is slow to start up
    */
@@ -18,7 +26,7 @@ const { get, last } = require("lodash");
       cleanChecks = 0;
       core.info(
         `Pending deployments. Checking again in ${core.getInput(
-          "max_timeout"
+          "check_interval"
         )} seconds...`
       );
     }
@@ -26,13 +34,7 @@ const { get, last } = require("lodash");
     await sleep(parseInt(core.getInput("check_interval")) * 1000);
   }
 
-  // setTimeout(() => {
-  //   core.setFailed(
-  //     `Timed out after ${core.getInput(
-  //       "max_timeout"
-  //     )} seconds of waiting for deployments`
-  //   );
-  // }, parseInt(core.getInput("max_timeout")) * 1000);
+  core.info(`Passed 3 times. All deploys look good 🚀`);
 })().catch((error) => core.setFailed(error.message));
 
 async function checkIfDeploymentsAreDone() {
