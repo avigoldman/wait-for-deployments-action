@@ -38,7 +38,7 @@ let timeout = setTimeout(() => {
   }
 
   core.info(
-    `${deployments} deployment${
+    `${deployments.length} deployment${
       deployments.length === 1 ? "" : "s"
     } look good 🚀`
   );
