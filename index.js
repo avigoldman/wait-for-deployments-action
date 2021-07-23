@@ -109,8 +109,6 @@ async function getRelatedDeployments() {
       `GET /repos/${repoName}/deployments/${deployment.id}/statuses`
     );
 
-    console.log({ data });
-
     const environment = deployment.environment;
     const state = get(data, "0.state");
     const url = get(data, "0.target_url");
