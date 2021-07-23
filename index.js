@@ -21,7 +21,7 @@ let timeout = setTimeout(() => {
   while (cleanChecks < 3) {
     core.info(`Running deployment check... `);
     deployments = await getRelatedDeployments();
-    const isPending = deployments.find(({ state }) => state === "pending");
+    const isPending = deployments.find(({ state }) => state !== "success");
     if (isPending) {
       cleanChecks = 0;
       core.info(
