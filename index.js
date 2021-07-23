@@ -95,7 +95,7 @@ async function checkIfDeploymentsAreDone() {
       `GET /repos/${repoName}/deployments/${deployment.id}/statuses`
     );
 
-    const state = get(data, "data.0.state");
+    const state = get(data, "data");
 
     console.log({ data }, state);
 
