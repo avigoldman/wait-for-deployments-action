@@ -16,7 +16,7 @@ inputs:
     required: false
 outputs:
   deployments:
-    description: "Array containing the deployment names and URLs"
+    description: "Array containing the deployment environments and URLs"
 runs:
   using: "node12"
   main: "index.js"

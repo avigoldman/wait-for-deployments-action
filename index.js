@@ -17,23 +17,27 @@ let timeout = setTimeout(() => {
   /**
    * We confirm 3 times in case there is a deploy that is slow to start up
    */
+  let deployments;
   while (cleanChecks < 3) {
     core.info(`Running deployment check... `);
-    if (await checkIfDeploymentsAreDone()) {
-      cleanChecks++;
-      core.info(`Passed ${cleanChecks} times`);
-    } else {
+    deployments = await getRelatedDeployments();
+    const isPending = deployments.find(({ state }) => state === "pending");
+    if (isPending) {
       cleanChecks = 0;
       core.info(
         `Pending deployments. Checking again in ${core.getInput(
           "check_interval"
         )} seconds...`
       );
+    } else {
+      cleanChecks++;
+      core.info(`Passed ${cleanChecks} times`);
     }
 
     await sleep(parseInt(core.getInput("check_interval")) * 1000);
   }
 
+  core.setOutput("deployments", deployments);
   core.info(`Passed 3 times. All deploys look good 🚀`);
 })()
   .then(() => {
@@ -44,7 +48,7 @@ let timeout = setTimeout(() => {
     core.setFailed(error.message);
   });
 
-async function checkIfDeploymentsAreDone() {
+async function getRelatedDeployments() {
   const token = core.getInput("github_token");
   const octokit = github.getOctokit(token);
   const repoName = github.context.payload.repository.full_name;
@@ -90,29 +94,33 @@ async function checkIfDeploymentsAreDone() {
   const deployments = [...commitDeployments, ...branchDeployments];
 
   /**
-   * Check each deployments status
+   * get the deployment statuses
    *
-   * If it is error, pass it through,
-   * if it is pending, return we are not done
+   * If it it a failure, throw an error
+   * Otherwise, collect it
    */
+  let simplifiedDeployments = [];
   for (const deployment of deployments) {
     const { data } = await octokit.request(
       `GET /repos/${repoName}/deployments/${deployment.id}/statuses`
     );
 
+    const environment = deployment.environment;
     const state = get(data, "0.state");
+    const url = get(data, "0.target_url");
 
     if (state === "failure") {
-      throw new Error(`${deployment.environment} failed.`);
+      throw new Error(`${environment} failed.`);
     }
 
-    if (state === "pending") {
-      return false;
-    }
+    simplifiedDeployments.push({
+      environment,
+      url,
+      state,
+    });
   }
 
-  // if all deployments passed, we are good to go!
-  return true;
+  return simplifiedDeployments;
 }
 
 function sleep(ms) {
