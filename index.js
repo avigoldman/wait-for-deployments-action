@@ -33,7 +33,7 @@ const { get, last } = require("lodash");
   //     )} seconds of waiting for deployments`
   //   );
   // }, parseInt(core.getInput("max_timeout")) * 1000);
-})().catch((e) => core.setFailed(error.message));
+})().catch((error) => core.setFailed(error.message));
 
 async function checkIfDeploymentsAreDone() {
   const token = core.getInput("github_token");
