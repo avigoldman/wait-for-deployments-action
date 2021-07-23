@@ -38,14 +38,15 @@ async function checkIfDeploymentsAreDone() {
   const octokit = github.getOctokit(token);
   const repoName = github.context.payload.repository.full_name;
   const commit = github.context.payload.after;
-  console.log(JSON.stringify(github.context.payload, null, 2));
-  // const branch = last(
-  //   get(github, "context.payload.head.ref", get(github, "context.payload.ref", '')).split(
-  //     "/"
-  //   )
-  // );
+  const branch = last(
+    get(
+      github,
+      "context.payload.head.ref",
+      get(github, "context.payload.ref", "")
+    ).split("/")
+  );
 
-  // console.log({ repoName, commit, branch });
+  console.log({ repoName, commit, branch });
 
   // const { data: commitDeployments } = await octokit.request(
   //   `GET /repos/${repoName}/deployments`,
