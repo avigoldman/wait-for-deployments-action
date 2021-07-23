@@ -18,7 +18,7 @@ const { get, last } = require("lodash");
    * We confirm 3 times in case there is a deploy that is slow to start up
    */
   while (cleanChecks < 3) {
-    core.info(`Running deployment check...`);
+    core.info(`Running deployment check... `);
     if (await checkIfDeploymentsAreDone()) {
       cleanChecks++;
       core.info(`Passed ${cleanChecks} times`);
