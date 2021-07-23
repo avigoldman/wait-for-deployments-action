@@ -9,14 +9,13 @@ const { get, last } = require("lodash");
 
     // while (cleanChecks < 3) {
     core.info(`Running check...`);
-    await checkIfDeploymentsAreDone();
-    // if (await checkIfDeploymentsAreDone()) {
-    cleanChecks++;
-    core.info(`passed ${cleanChecks} times`);
-    // } else {
-    //   cleanChecks = 0;
-    //   core.info(`Waiting again...`);
-    // }
+    if (await checkIfDeploymentsAreDone()) {
+      cleanChecks++;
+      core.info(`Passed ${cleanChecks} times`);
+    } else {
+      cleanChecks = 0;
+      core.info(`Waiting again...`);
+    }
 
     // await sleep(parseInt(core.getInput("max_timeout")) * 1000);
     // }
