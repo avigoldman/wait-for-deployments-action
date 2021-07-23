@@ -50,25 +50,33 @@ async function checkIfDeploymentsAreDone() {
     ).split("/")
   );
 
-  const { data: commitDeployments } = await octokit.request(
-    `GET /repos/${repoName}/deployments`,
-    {
-      ref: commit,
-      per_page: 100,
-    }
-  );
+  let commitDeployments = [];
+  if (commit.length > 0) {
+    const { data } = await octokit.request(
+      `GET /repos/${repoName}/deployments`,
+      {
+        ref: commit,
+        per_page: 100,
+      }
+    );
+    commitDeployments = data;
+  }
 
-  console.log(commitDeployments);
+  let branchDeployments = [];
+  if (branch.length > 0) {
+    const { data } = await octokit.request(
+      `GET /repos/${repoName}/deployments`,
+      {
+        ref: branch,
+        per_page: 100,
+      }
+    );
+    branchDeployments = data;
+  }
 
-  // const { data: branchDeployments } = await octokit.request(
-  //   `GET /repos/${repoName}/deployments`,
-  //   {
-  //     ref: branch,
-  //     per_page: 100,
-  //   }
-  // );
+  const deployments = [...commitDeployments, ...branchDeployments];
 
-  // const deployments = [...commitDeployments, ...branchDeployments];
+  console.log({ deployments });
 
   // for (const deployment of deployments) {
   //   const { state } = await octokit.request(
