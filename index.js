@@ -7,18 +7,18 @@ const { get, last } = require("lodash");
     core.info(`Starting...`);
     let cleanChecks = 0;
 
-    // while (cleanChecks < 3) {
-    core.info(`Running check...`);
-    if (await checkIfDeploymentsAreDone()) {
-      cleanChecks++;
-      core.info(`Passed ${cleanChecks} times`);
-    } else {
-      cleanChecks = 0;
-      core.info(`Waiting again...`);
-    }
+    while (cleanChecks < 3) {
+      core.info(`Running check...`);
+      if (await checkIfDeploymentsAreDone()) {
+        cleanChecks++;
+        core.info(`Passed ${cleanChecks} times`);
+      } else {
+        cleanChecks = 0;
+        core.info(`Waiting again...`);
+      }
 
-    // await sleep(parseInt(core.getInput("max_timeout")) * 1000);
-    // }
+      await sleep(parseInt(core.getInput("max_timeout")) * 1000);
+    }
   } catch (error) {
     core.setFailed(error.message);
   }
