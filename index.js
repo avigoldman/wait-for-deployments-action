@@ -3,31 +3,32 @@ const github = require("@actions/github");
 const { get, last } = require("lodash");
 
 (async () => {
-  try {
-    core.info(`Starting...`);
-    let cleanChecks = 0;
+  core.info(`Starting...`);
+  let cleanChecks = 0;
 
-    /**
-     * We confirm 3 times in case there is a deploy that is slow to start up
-     */
-    // while (cleanChecks < 3) {
+  /**
+   * We confirm 3 times in case there is a deploy that is slow to start up
+   */
+  while (cleanChecks < 3) {
     core.info(`Running deployment check...`);
-    if (await checkIfDeploymentsAreDone()) {
-      cleanChecks++;
-      core.info(`Passed ${cleanChecks} times`);
-    } else {
-      cleanChecks = 0;
-      core.info(
-        `Pending deployments. Checking again in ${core.getInput(
-          "max_timeout"
-        )} seconds...`
-      );
+    try {
+      if (await checkIfDeploymentsAreDone()) {
+        cleanChecks++;
+        core.info(`Passed ${cleanChecks} times`);
+      } else {
+        cleanChecks = 0;
+        core.info(
+          `Pending deployments. Checking again in ${core.getInput(
+            "max_timeout"
+          )} seconds...`
+        );
+      }
+    } catch (error) {
+      core.setFailed(error.message);
+      throw error;
     }
 
     await sleep(parseInt(core.getInput("check_interval")) * 1000);
-    // }
-  } catch (error) {
-    core.setFailed(error.message);
   }
 
   // setTimeout(() => {
@@ -98,7 +99,6 @@ async function checkIfDeploymentsAreDone() {
     const state = get(data, "0.state");
 
     if (state === "failure") {
-      core.setFailed(`${deployment.environment} failed.`);
       throw new Error(`${deployment.environment} failed.`);
     }
 
