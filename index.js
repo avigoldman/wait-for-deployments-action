@@ -3,15 +3,16 @@ const github = require("@actions/github");
 const { get, last } = require("lodash");
 
 (async () => {
+  core.info(`Starting...`);
   let cleanChecks = 0;
 
   while (cleanChecks < 3) {
     if (await checkIfDeploymentsAreDone()) {
       cleanChecks++;
-      console.log(`passed ${cleanChecks} times`);
+      core.info(`passed ${cleanChecks} times`);
     } else {
       cleanChecks = 0;
-      console.log(`Waiting again...`);
+      core.info(`Waiting again...`);
     }
 
     await sleep(parseInt(core.getInput("max_timeout")) * 1000);
