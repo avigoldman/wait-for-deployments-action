@@ -99,9 +99,6 @@ async function getRelatedDeployments() {
 
   /**
    * get the deployment statuses
-   *
-   * If it it a failure, throw an error
-   * Otherwise, collect it
    */
   let simplifiedDeployments = [];
   for (const deployment of deployments) {
@@ -113,6 +110,12 @@ async function getRelatedDeployments() {
     const state = get(data, "0.state");
     const url = get(data, "0.target_url");
 
+    // if it's inactive, skip it
+    if (state === "inactive") {
+      break;
+    }
+
+    // if it's a failure, throw an error
     if (state === "failure") {
       throw new Error(`${environment} failed.`);
     }
