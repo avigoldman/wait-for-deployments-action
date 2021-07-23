@@ -97,6 +97,8 @@ async function checkIfDeploymentsAreDone() {
       `GET /repos/${repoName}/deployments/${deployment.id}/statuses`
     );
 
+    console.log({ state });
+
     if (state === "failure") {
       throw new Error(`${deployment.environment} failed.`);
     }
