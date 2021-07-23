@@ -95,8 +95,6 @@ async function getRelatedDeployments() {
     branchDeployments = data;
   }
 
-  console.log({ commitDeployments, branchDeployments });
-
   const deployments = [...commitDeployments, ...branchDeployments];
 
   /**
@@ -110,6 +108,8 @@ async function getRelatedDeployments() {
     const { data } = await octokit.request(
       `GET /repos/${repoName}/deployments/${deployment.id}/statuses`
     );
+
+    console.log({ data });
 
     const environment = deployment.environment;
     const state = get(data, "0.state");
