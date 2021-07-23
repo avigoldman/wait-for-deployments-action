@@ -97,7 +97,7 @@ async function checkIfDeploymentsAreDone() {
 
     const state = get(data, "data.0.state");
 
-    console.log({ data });
+    console.log({ data }, state);
 
     // if (state === "failure") {
     //   throw new Error(`${deployment.environment} failed.`);
