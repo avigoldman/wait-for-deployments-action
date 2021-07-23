@@ -46,6 +46,8 @@ async function checkIfDeploymentsAreDone() {
     ).split("/")
   );
 
+  console.log("here");
+
   console.log({ repoName, commit, branch });
 
   // const { data: commitDeployments } = await octokit.request(
