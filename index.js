@@ -15,10 +15,10 @@ let timeout = setTimeout(() => {
   let cleanChecks = 0;
 
   /**
-   * We confirm 3 times in case there is a deploy that is slow to start up
+   * We confirm twice in case there is a deploy that is slow to start up
    */
   let deployments;
-  while (cleanChecks < 3) {
+  while (cleanChecks < 2) {
     core.info(`Running deployment check... `);
     deployments = await getRelatedDeployments();
     const isPending = deployments.find(({ state }) => state !== "success");
