@@ -37,12 +37,16 @@ async function checkIfDeploymentsAreDone() {
   const token = core.getInput("github_token");
   const octokit = github.getOctokit(token);
   const repoName = github.context.payload.repository.full_name;
-  const commit = github.context.payload.after;
+  const commit = get(
+    github,
+    "context.payload.after",
+    get(github, "context.playload.pull_request.head.sha", "")
+  );
   const branch = last(
     get(
       github,
-      "context.payload.head.ref",
-      get(github, "context.payload.ref", "")
+      "context.payload.ref",
+      get(github, "context.payload.pull_request.head.ref", "")
     ).split("/")
   );
 
