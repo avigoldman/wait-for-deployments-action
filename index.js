@@ -11,21 +11,16 @@ const { get, last } = require("lodash");
    */
   while (cleanChecks < 3) {
     core.info(`Running deployment check...`);
-    try {
-      if (await checkIfDeploymentsAreDone()) {
-        cleanChecks++;
-        core.info(`Passed ${cleanChecks} times`);
-      } else {
-        cleanChecks = 0;
-        core.info(
-          `Pending deployments. Checking again in ${core.getInput(
-            "max_timeout"
-          )} seconds...`
-        );
-      }
-    } catch (error) {
-      core.setFailed(error.message);
-      throw error;
+    if (await checkIfDeploymentsAreDone()) {
+      cleanChecks++;
+      core.info(`Passed ${cleanChecks} times`);
+    } else {
+      cleanChecks = 0;
+      core.info(
+        `Pending deployments. Checking again in ${core.getInput(
+          "max_timeout"
+        )} seconds...`
+      );
     }
 
     await sleep(parseInt(core.getInput("check_interval")) * 1000);
@@ -38,7 +33,7 @@ const { get, last } = require("lodash");
   //     )} seconds of waiting for deployments`
   //   );
   // }, parseInt(core.getInput("max_timeout")) * 1000);
-})();
+})().catch((e) => core.setFailed(error.message));
 
 async function checkIfDeploymentsAreDone() {
   const token = core.getInput("github_token");
