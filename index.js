@@ -95,6 +95,8 @@ async function getRelatedDeployments() {
     branchDeployments = data;
   }
 
+  console.log({ commitDeployments, branchDeployments });
+
   const deployments = [...commitDeployments, ...branchDeployments];
 
   /**
