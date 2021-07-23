@@ -97,15 +97,13 @@ async function checkIfDeploymentsAreDone() {
 
     const state = get(data, "0.state");
 
-    console.log({ data, state });
+    if (state === "failure") {
+      throw new Error(`${deployment.environment} failed.`);
+    }
 
-    // if (state === "failure") {
-    //   throw new Error(`${deployment.environment} failed.`);
-    // }
-
-    // if (state === "pending") {
-    //   return false;
-    // }
+    if (state === "pending") {
+      return false;
+    }
   }
 
   // if all deployments passed, we are good to go!
