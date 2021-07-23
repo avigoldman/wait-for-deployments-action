@@ -2,17 +2,17 @@ const core = require("@actions/core");
 const github = require("@actions/github");
 const { get, last } = require("lodash");
 
+let timeout = setTimeout(() => {
+  core.setFailed(
+    `Timed out after ${core.getInput(
+      "max_timeout"
+    )} seconds of waiting for deployments`
+  );
+}, parseInt(core.getInput("max_timeout")) * 1000);
+
 (async () => {
   core.info(`Starting...`);
   let cleanChecks = 0;
-
-  setTimeout(() => {
-    core.setFailed(
-      `Timed out after ${core.getInput(
-        "max_timeout"
-      )} seconds of waiting for deployments`
-    );
-  }, parseInt(core.getInput("max_timeout")) * 1000);
 
   /**
    * We confirm 3 times in case there is a deploy that is slow to start up
@@ -35,7 +35,14 @@ const { get, last } = require("lodash");
   }
 
   core.info(`Passed 3 times. All deploys look good 🚀`);
-})().catch((error) => core.setFailed(error.message));
+})()
+  .then(() => {
+    clearTimeout(timeout);
+  })
+  .catch((error) => {
+    clearTimeout(timeout);
+    core.setFailed(error.message);
+  });
 
 async function checkIfDeploymentsAreDone() {
   const token = core.getInput("github_token");
