@@ -61,9 +61,12 @@ Promise.race([
     core.setOutput("deployments", deployments);
   })(),
 ])
-  .then(() => {})
+  .then(() => {
+    process.exit();
+  })
   .catch((error) => {
     core.setFailed(error.message);
+    process.exit();
   });
 
 async function getRelatedDeployments() {
