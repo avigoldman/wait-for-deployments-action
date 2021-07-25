@@ -6,13 +6,16 @@ branding:
 inputs:
   github_token:
     description: "GitHub access token."
+  environment_filter:
+    description: "Regular expression to filter which environments we are waiting for."
+    required: false
   check_interval:
     description: "Seconds to wait between deployment checks."
-    default: "60"
+    default: "30"
     required: false
   max_timeout:
     description: "Max seconds to wait for the deploys to finish."
-    default: "900"
+    default: "1200"
     required: false
 outputs:
   deployments:

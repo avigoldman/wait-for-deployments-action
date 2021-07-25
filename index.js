@@ -2,53 +2,67 @@ const core = require("@actions/core");
 const github = require("@actions/github");
 const { get, last } = require("lodash");
 
-let timeout = setTimeout(() => {
-  core.setFailed(
-    `Timed out after ${core.getInput(
-      "max_timeout"
-    )} seconds of waiting for deployments`
-  );
-}, parseInt(core.getInput("max_timeout")) * 1000);
+const REQUIRED_CHECK_OUT = 3;
+const ENVIRONMENT_REGEX = core.getInput("environment_filter")
+  ? new RegExp(core.getInput("environment_filter"))
+  : null;
 
-(async () => {
-  core.info(`Starting...`);
-  let cleanChecks = 0;
+Promise.race([
+  sleep(parseInt(core.getInput("max_timeout")) * 1000).then(() => {
+    core.setFailed(
+      `Timed out after ${core.getInput(
+        "max_timeout"
+      )} seconds of waiting for deployments`
+    );
+  }),
+  (async () => {
+    core.info(`Starting...`);
+    let cleanChecks = 0;
 
-  /**
-   * We confirm twice in case there is a deploy that is slow to start up
-   */
-  let deployments;
-  while (cleanChecks < 2) {
-    core.info(`Running deployment check... `);
-    deployments = await getRelatedDeployments();
-    const isPending = deployments.find(({ state }) => state !== "success");
-    if (isPending) {
-      cleanChecks = 0;
-      core.info(
-        `Pending deployments. Checking again in ${core.getInput(
-          "check_interval"
-        )} seconds...`
-      );
-    } else {
-      cleanChecks++;
-      core.info(`Passed ${cleanChecks} times`);
+    /**
+     * We confirm 3 times in case there is a deploy that is slow to start up
+     */
+    let deployments;
+    while (cleanChecks < REQUIRED_CHECK_OUT) {
+      core.info(`Running deployment check... `);
+      deployments = await getRelatedDeployments();
+      const isPending = deployments.find(({ state }) => state !== "success");
+      if (isPending) {
+        cleanChecks = 0;
+        core.info(
+          `Pending deployments. Checking again in ${core.getInput(
+            "check_interval"
+          )} seconds...`
+        );
+        await sleep(parseInt(core.getInput("check_interval")) * 1000);
+      } else {
+        cleanChecks++;
+
+        if (cleanChecks < REQUIRED_CHECK_OUT) {
+          core.info(
+            `Passed ${cleanChecks} time${
+              cleanChecks === 1 ? "" : "s"
+            }. Waiting 30 seconds before next check...`
+          );
+          await sleep(30 * 1000);
+        } else {
+          core.info(
+            `Passed ${cleanChecks} time${cleanChecks === 1 ? "" : "s"}.`
+          );
+        }
+      }
     }
 
-    await sleep(parseInt(core.getInput("check_interval")) * 1000);
-  }
-
-  core.info(
-    `${deployments.length} deployment${
-      deployments.length === 1 ? "" : "s"
-    } look good 🚀`
-  );
-  core.setOutput("deployments", deployments);
-})()
-  .then(() => {
-    clearTimeout(timeout);
-  })
+    core.info(
+      `${deployments.length} deployment${
+        deployments.length === 1 ? "" : "s"
+      } look good 🚀`
+    );
+    core.setOutput("deployments", deployments);
+  })(),
+])
+  .then(() => {})
   .catch((error) => {
-    clearTimeout(timeout);
     core.setFailed(error.message);
   });
 
@@ -95,7 +109,10 @@ async function getRelatedDeployments() {
     branchDeployments = data;
   }
 
-  const deployments = [...commitDeployments, ...branchDeployments];
+  const deployments = [...commitDeployments, ...branchDeployments].filter(
+    (deployment) =>
+      ENVIRONMENT_REGEX ? ENVIRONMENT_REGEX.test(deployment.environment) : true
+  );
 
   /**
    * get the deployment statuses
