@@ -9,13 +9,17 @@ inputs:
   environment_filter:
     description: "Regular expression to filter which environments we are waiting for."
     required: false
+  initial_delay:
+    description: "Time to wait before starting checks."
+    default: "0s"
+    required: false
   check_interval:
-    description: "Seconds to wait between deployment checks."
-    default: "30"
+    description: "Time to wait between deployment checks."
+    default: "30s"
     required: false
   max_timeout:
-    description: "Max seconds to wait for the deploys to finish."
-    default: "1200"
+    description: "Time to wait for the deploys to finish."
+    default: "20m"
     required: false
 outputs:
   deployments:
