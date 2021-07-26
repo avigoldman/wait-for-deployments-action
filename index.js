@@ -65,7 +65,7 @@ const octokit = github.getOctokit(GITHUB_TOKEN);
         cleanChecks = 0;
         core.info(
           `Pending deployments. Checking again in ${
-            CHECK_INTERNVAL / 1000
+            CHECK_INTERVAL / 1000
           } seconds`
         );
         await sleep(CHECK_INTERVAL);
