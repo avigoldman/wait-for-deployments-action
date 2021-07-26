@@ -34,7 +34,7 @@ const octokit = github.getOctokit(GITHUB_TOKEN);
   /**
    * Wait for initial delay
    */
-  core.info(`Waiting inital delay of ${INITIAL_DELAY / 1000} seconds`);
+  core.info(`Waiting inital delay of ${INITIAL_DELAY / 1000} seconds...`);
   await sleep(INITIAL_DELAY);
 
   /**
@@ -66,7 +66,7 @@ const octokit = github.getOctokit(GITHUB_TOKEN);
         core.info(
           `Pending deployments. Checking again in ${
             CHECK_INTERVAL / 1000
-          } seconds`
+          } seconds.`
         );
         await sleep(CHECK_INTERVAL);
       } else {
@@ -92,7 +92,10 @@ const octokit = github.getOctokit(GITHUB_TOKEN);
         deployments.length === 1 ? "" : "s"
       } look good 🚀`
     );
-    core.setOutput("deployments", deployments);
+    core.setOutput(
+      "deployments",
+      deployments.map(({ environment, url }) => ({ environment, url }))
+    );
   })();
 
   /**
@@ -159,7 +162,7 @@ async function getRelatedDeployments() {
 
     const environment = deployment.environment;
     const state = get(data, "0.state");
-    const url = get(data, "0.target_url");
+    const url = get(data, "0.environment_url");
 
     // if it's inactive, skip it
     if (state === "inactive") {
