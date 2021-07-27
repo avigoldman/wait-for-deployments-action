@@ -162,7 +162,7 @@ async function getRelatedDeployments() {
 
     const environment = deployment.environment;
     const state = get(data, "0.state");
-    const url = get(data, "0.environment_url");
+    const url = get(data, "0.environment_url", get(data, "0.target_url");
 
     // if it's inactive, skip it
     if (state === "inactive") {

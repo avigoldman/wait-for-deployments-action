@@ -25,10 +25,10 @@ jobs:
 ## Inputs
 
 - `github_token` - GitHub access token. Required.
-- `environment_filter` - Regular expression to filter whic henvironments we are waiting for.
-- `initial_delay` - Time to wait before starting checks. Defaults to `0s`.
+- `environment_filter` - Regular expression used against the environment name to filter which deployments to wait for.
+- `initial_delay` - Time to wait before starting deployment checks. Defaults to `0s`.
 - `check_interval` - Time to wait between deployment checks. Defaults to `30s`.
-- `max_timeout` - Time to wait for the deploys to finish. Defaults to `20m`.
+- `max_timeout` - Time to wait for the deployments to finish. Defaults to `20m`.
 
 `initial_delay`, `check_interval`, and `max_timeout` all accept a "[to-time](https://www.npmjs.com/package/to-time)" input.
 
@@ -43,7 +43,7 @@ After this action completes, you will have access to the variable `deployments` 
 
 ![Deployments table screenshot from GitHub](./deployments.png)
 
-```yml
+```diff
 on: [pull_request]
 jobs:
   wait_for_deployments_job:
@@ -66,7 +66,7 @@ If a deployment fails, this action will fail as well.
 
 You can catch this error with an additional step:
 
-```yml
+```diff
 on: [pull_request]
 jobs:
   wait_for_deployments_job:

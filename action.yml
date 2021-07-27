@@ -7,7 +7,7 @@ inputs:
   github_token:
     description: "GitHub access token."
   environment_filter:
-    description: "Regular expression to filter which environments we are waiting for."
+    description: "Regular expression to filter which environments to wait for."
     required: false
   initial_delay:
     description: "Time to wait before starting checks."
