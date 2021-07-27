@@ -2,7 +2,7 @@
 
 Waits for all GitHub deployments to succeed before continuing.
 
-You can use this to wait for your deployments to finish building before running tests against the live versions of your websites.
+Use this to wait for your deployments to finish building before running tests against the live versions of your websites.
 
 ## Usage
 
