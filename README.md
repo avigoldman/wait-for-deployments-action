@@ -17,7 +17,7 @@ jobs:
     steps:
       - name: Wait for deployments
         id: wait
-        uses: useparcel/wait-for-deployments-action@1.0.0
+        uses: useparcel/wait-for-deployments-action@0.1.0
         with:
           github_token: ${{ secrets.GITHUB_TOKEN }}
 ```
@@ -52,7 +52,7 @@ jobs:
     steps:
       - name: Wait for deployments
         id: wait
-        uses: useparcel/wait-for-deployments-action@1.0.0
+        uses: useparcel/wait-for-deployments-action@0.1.0
         with:
           github_token: ${{ secrets.GITHUB_TOKEN }}
 +     - name: Log deployments
@@ -75,7 +75,7 @@ jobs:
     steps:
       - name: Wait for deployments
         id: wait
-        uses: useparcel/wait-for-deployments-action@1.0.0
+        uses: useparcel/wait-for-deployments-action@0.1.0
         with:
           github_token: ${{ secrets.GITHUB_TOKEN }}
       - name: Log deployments
