@@ -6,7 +6,7 @@ You can use this to wait for your deployments to finish building before running 
 
 ## Usage
 
-See [action.yml](https://github.com/useparcel/wait-for-deployments-action/)
+See [action.yml](https://github.com/useparcel/wait-for-deployments-action/blob/main/action.yml)
 
 ```yml
 on: [pull_request]
