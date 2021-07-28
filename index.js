@@ -168,7 +168,6 @@ async function getRelatedDeployments() {
    * get the deployment statuses
    */
   let simplifiedDeployments = [];
-  console.log(deployments);
   for (const deployment of deployments) {
     const { data } = await octokit.request(
       `GET /repos/${GIT_REPO}/deployments/${deployment.id}/statuses`
