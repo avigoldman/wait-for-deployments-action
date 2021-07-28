@@ -54,6 +54,8 @@ const checker = (async () => {
   while (cleanChecks < REQUIRED_CHECK_COUNT) {
     core.info(`Running deployment check... `);
     deployments = await getRelatedDeployments();
+    console.log(deployments);
+    process.exit();
     const isPending = deployments.find(({ state }) => state !== "success");
     if (isPending) {
       core.info(`Pending deployment: ${JSON.stringify(isPending)}`);
@@ -115,7 +117,7 @@ const checker = (async () => {
  *
  * If either throws and error kill the process with an error.
  */
-Promise.race([timeout, checker])
+Promise.race([checker, timeout])
   .then(() => {
     process.exit();
   })
