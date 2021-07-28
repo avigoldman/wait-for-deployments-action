@@ -115,7 +115,7 @@ const checker = (async () => {
  *
  * If either throws and error kill the process with an error.
  */
-await Promise.race([timeout, checker])
+Promise.race([timeout, checker])
   .then(() => {
     process.exit();
   })
