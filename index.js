@@ -30,88 +30,98 @@ const GIT_BRANCH = last(
 const GITHUB_TOKEN = core.getInput("github_token");
 const octokit = github.getOctokit(GITHUB_TOKEN);
 
-(async () => {
-  /**
-   * Wait for initial delay
-   */
-  core.info(`Waiting inital delay of ${INITIAL_DELAY / 1000} seconds...`);
-  await sleep(INITIAL_DELAY);
+/**
+ * Fail the process after we run out of time
+ */
+const timeout = sleep(MAX_TIMEOUT + INITIAL_DELAY).then(() => {
+  core.setFailed(
+    `Timed out after ${MAX_TIMEOUT / 1000} seconds of waiting for deployments`
+  );
+});
+
+/**
+ * Run the deployment checks
+ */
+const checker = (async () => {
+  core.info(`Starting checks...`);
+  let cleanChecks = 0;
 
   /**
-   * Fail the process after we run out of time
+   * We confirm 3 times in case there is a deploy that is slow to start up
    */
-  const timeout = sleep(MAX_TIMEOUT).then(() => {
-    core.setFailed(
-      `Timed out after ${MAX_TIMEOUT / 1000} seconds of waiting for deployments`
-    );
-  });
+  let isFirstCheck = true;
+  let deployments;
+  while (cleanChecks < REQUIRED_CHECK_COUNT) {
+    core.info(`Running deployment check... `);
+    deployments = await getRelatedDeployments();
+    const isPending = deployments.find(({ state }) => state !== "success");
+    if (isPending) {
+      cleanChecks = 0;
 
-  /**
-   * Run the deployment checks
-   */
-  const checker = (async () => {
-    core.info(`Starting checks...`);
-    let cleanChecks = 0;
-
-    /**
-     * We confirm 3 times in case there is a deploy that is slow to start up
-     */
-    let deployments;
-    while (cleanChecks < REQUIRED_CHECK_COUNT) {
-      core.info(`Running deployment check... `);
-      deployments = await getRelatedDeployments();
-      const isPending = deployments.find(({ state }) => state !== "success");
-      if (isPending) {
-        cleanChecks = 0;
+      /**
+       * Wait for initial delay or just a regular pause
+       */
+      if (isFirstCheck) {
+        core.info(
+          `Pending deployments. Waiting inital delay of ${
+            INITIAL_DELAY / 1000
+          } seconds...`
+        );
+        await sleep(INITIAL_DELAY);
+      } else {
         core.info(
           `Pending deployments. Checking again in ${
             CHECK_INTERVAL / 1000
           } seconds.`
         );
         await sleep(CHECK_INTERVAL);
-      } else {
-        cleanChecks++;
+      }
+    } else {
+      cleanChecks++;
 
-        if (cleanChecks < REQUIRED_CHECK_COUNT) {
-          core.info(
-            `Passed ${cleanChecks} time${
-              cleanChecks === 1 ? "" : "s"
-            }. Waiting 30 seconds before next check...`
-          );
-          await sleep(30 * 1000);
-        } else {
-          core.info(
-            `Passed ${cleanChecks} time${cleanChecks === 1 ? "" : "s"}.`
-          );
-        }
+      if (cleanChecks < REQUIRED_CHECK_COUNT) {
+        core.info(
+          `Passed ${cleanChecks} time${
+            cleanChecks === 1 ? "" : "s"
+          }. Waiting 30 seconds before next check...`
+        );
+        await sleep(30 * 1000);
+      } else {
+        core.info(`Passed ${cleanChecks} time${cleanChecks === 1 ? "" : "s"}.`);
       }
     }
 
-    core.info(
-      `${deployments.length} deployment${
-        deployments.length === 1 ? "" : "s"
-      } look good 🚀`
-    );
-    core.setOutput(
-      "deployments",
-      deployments.map(({ environment, url }) => ({ environment, url }))
-    );
-  })();
-
-  /**
-   * Race the timeout and checker
-   *
-   * When either finishes, kill the process.
-   *
-   * If either throws and error kill the process with an error.
-   */
-  try {
-    await Promise.race([timeout, checker]);
-  } catch (error) {
-    core.setFailed(error.message);
+    if (isFirstCheck) {
+      isFirstCheck = false;
+    }
   }
-  process.exit();
+
+  core.info(
+    `${deployments.length} deployment${
+      deployments.length === 1 ? "" : "s"
+    } look good 🚀`
+  );
+  core.setOutput(
+    "deployments",
+    deployments.map(({ environment, url }) => ({ environment, url }))
+  );
 })();
+
+/**
+ * Race the timeout and checker
+ *
+ * When either finishes, kill the process.
+ *
+ * If either throws and error kill the process with an error.
+ */
+await Promise.race([timeout, checker])
+  .then(() => {
+    process.exit();
+  })
+  .catch((error) => {
+    core.setFailed(error.message);
+    process.exit();
+  });
 
 /**
  * Returns an array of deployments tied to the GIT_COMMIT or
