@@ -1,7 +1,7 @@
 const core = require("@actions/core");
 const github = require("@actions/github");
 const toTime = require("to-time");
-const { get, last } = require("lodash");
+const { get, last, uniqBy } = require("lodash");
 
 const REQUIRED_CHECK_COUNT = 3;
 // get the inital delay, max run time, and check interval
@@ -158,9 +158,11 @@ async function getRelatedDeployments() {
     branchDeployments = data;
   }
 
-  const deployments = [...commitDeployments, ...branchDeployments].filter(
-    (deployment) =>
+  const deployments = uniqBy(
+    [...commitDeployments, ...branchDeployments].filter((deployment) =>
       ENVIRONMENT_REGEX ? ENVIRONMENT_REGEX.test(deployment.environment) : true
+    ),
+    "environment"
   );
 
   /**
