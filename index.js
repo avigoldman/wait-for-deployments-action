@@ -54,7 +54,6 @@ const checker = (async () => {
   while (cleanChecks < REQUIRED_CHECK_COUNT) {
     core.info(`Running deployment check... `);
     deployments = await getRelatedDeployments();
-    console.log(deployments);
     process.exit();
     const isPending = deployments.find(({ state }) => state !== "success");
     if (isPending) {
@@ -168,6 +167,7 @@ async function getRelatedDeployments() {
    * get the deployment statuses
    */
   let simplifiedDeployments = [];
+  console.log(deployments);
   for (const deployment of deployments) {
     const { data } = await octokit.request(
       `GET /repos/${GIT_REPO}/deployments/${deployment.id}/statuses`
