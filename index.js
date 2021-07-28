@@ -56,6 +56,7 @@ const checker = (async () => {
     deployments = await getRelatedDeployments();
     const isPending = deployments.find(({ state }) => state !== "success");
     if (isPending) {
+      core.info(`Pending deployment: ${JSON.stringify(isPending)}`);
       cleanChecks = 0;
 
       /**
